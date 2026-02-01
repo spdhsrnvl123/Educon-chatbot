@@ -5,7 +5,8 @@
 ![React](https://img.shields.io/badge/React-19.x-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?logo=tailwindcss)
-![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite)
+![Nginx](https://img.shields.io/badge/Nginx-1.20-009639?logo=nginx)
+![Rocky Linux](https://img.shields.io/badge/Rocky_Linux-9.5-10B981?logo=rockylinux)
 
 ## 프로젝트 소개
 
@@ -20,7 +21,7 @@
 
 ## 데모
 
-**Live Demo**: [https://chatbot-taupe-two-95.vercel.app](https://chatbot-taupe-two-95.vercel.app)
+🔗 **Live**: [https://chatbot.con.or.kr](https://chatbot.con.or.kr)
 
 ## 주요 기능
 
@@ -45,12 +46,30 @@
 
 | 분류 | 기술 |
 |------|------|
-| **Frontend** | React 19, TypeScript |
-| **상태관리** | Zustand |
+| **Frontend** | React 19, TypeScript, Zustand |
 | **스타일링** | Tailwind CSS |
 | **빌드 도구** | Vite |
-| **배포** | Vercel |
-| **아이콘** | Lucide React |
+| **서버** | Nginx, Rocky Linux 9.5 |
+| **배포** | 자동화 스크립트 (deploy.sh) |
+| **보안** | SSL 인증서 (HTTPS) |
+
+## 아키텍처
+```
+[로컬 개발]
+코드 수정 → npm run build → dist 폴더 생성
+
+[배포]
+./deploy.sh 실행
+  ├── 빌드 (npm run build)
+  ├── SCP로 서버 업로드
+  └── 권한 설정 (chmod, chown, chcon)
+
+[서버 구성]
+Nginx (443 포트)
+  ├── SSL 인증서 적용
+  ├── 정적 파일 서빙 (/var/www/chatbot)
+  └── React SPA 라우팅 (try_files)
+```
 
 ## 프로젝트 구조
 ```
@@ -61,43 +80,50 @@ src/
 │   │   ├── subcategory-buttons.tsx
 │   │   ├── question-buttons.tsx
 │   │   ├── navigation-buttons.tsx
+│   │   ├── kakao-contact.tsx
+│   │   ├── start-button.tsx
 │   │   ├── search-results.tsx
-│   │   ├── subcategory-results.tsx
 │   │   └── chat-input.tsx
 │   ├── layout/
 │   │   └── chat-header.tsx
 │   ├── chat-message.tsx
 │   └── typing-indicator.tsx
 │
-├── stores/                   # Zustand 스토어
-│   ├── message-store.ts      # 메시지 상태
-│   ├── navigation-store.ts   # 네비게이션 상태
-│   └── search-store.ts       # 검색 결과 상태
+├── config/                   # 설정 파일
+│   ├── companies.ts          # 회사별 설정
+│   └── contact.ts            # 연락처 정보
 │
-├── hooks/
-│   └── use-chat-search.ts    # 검색 커스텀 훅
+├── stores/                   # Zustand 스토어
+│   ├── message-store.ts
+│   ├── navigation-store.ts
+│   └── search-store.ts
+│
+├── hooks/                    # 커스텀 훅
+│   ├── use-chat-handlers.ts
+│   ├── use-chat-search.ts
+│   └── use-company.ts
 │
 ├── types/                    # 타입 정의
-│   ├── index.ts
-│   ├── chat.ts               # Message, DisplayType
-│   ├── faq.ts                # Category, SubCategory, Question
-│   └── search.ts             # SearchResult, Suggestion
+│   ├── chat.ts
+│   ├── faq.ts
+│   └── search.ts
 │
 ├── db/                       # FAQ 데이터
-│   ├── index.ts
-│   ├── enrollment.ts         # 수강신청
-│   ├── completion.ts         # 수강·수료
-│   ├── member.ts             # 회원정보
-│   ├── tuition.ts            # 교육비
-│   ├── payment.ts            # 결제·환불
-│   └── online.ts             # 온라인강의
-│
-├── data/
-│   ├── keywords.ts           # 검색 키워드 매핑
-│   └── suggestions.ts        # 추천 검색어
+│   ├── enrollment.ts
+│   ├── completion.ts
+│   ├── member.ts
+│   ├── tuition.ts
+│   ├── payment.ts
+│   └── online.ts
 │
 └── pages/
-    └── chatbot-page.tsx      # 메인 페이지
+    └── chatbot-page.tsx
+```
+
+## 배포 방법
+```bash
+# 배포 스크립트 실행 (빌드 + 업로드 + 권한 설정)
+./deploy.sh
 ```
 
 ## UI/UX 특징
@@ -115,10 +141,8 @@ src/
 
 ## 개선 예정 사항
 
+- [x] Nginx 서버 배포
+- [x] SSL 인증서 적용
+- [x] 배포 자동화 스크립트 구축
 - [ ] Supabase 연동으로 FAQ 데이터 관리
 - [ ] 관리자 페이지 개발
-- [ ] 본 서버 적용
-
-## 참고사항
-
-현재 테스트 서버에서 검증 중입니다.
